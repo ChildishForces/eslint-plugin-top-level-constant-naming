@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-top-level-constant-naming",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "enforces a naming convention for top level constants",
   "type": "module",
   "keywords": [
@@ -14,6 +14,7 @@
     "compile": "tsc -p tsconfig.build.json",
     "lint": "npm-run-all \"lint:*\"",
     "lint:js": "eslint .",
+    "switch-to-cjs": "node scripts/prepareForPublish.cjs",
     "test": "vitest tests"
   },
   "dependencies": {
