@@ -3,4 +3,5 @@ export enum StringCase {
   ScreamingSnakeCase = 'screamingSnakeCase',
   CamelCase = 'camelCase',
   PascalCase = 'pascalCase',
+  MixedCase = 'mixedCase',
 }

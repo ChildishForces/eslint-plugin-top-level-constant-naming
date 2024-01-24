@@ -2,13 +2,12 @@
   "extends": "@tsconfig/node18",
   "compilerOptions": {
     "moduleResolution": "node",
-    "module": "ESNext",
     "lib": ["esnext", "dom"],
     "target": "es5",
     "sourceMap": true,
     "strict": true,
     "outDir": "./dist",
-    "types": ["vitest/globals", "node"],
+    "types": ["jest", "node"],
     "declaration": true
   },
   "include": ["src/**/*.ts", "tests/**/*.ts"],

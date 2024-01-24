@@ -4,7 +4,7 @@ import { StringCase } from './constants';
  * Detect casing of a string value
  * @param input
  */
-export const detectCase = (input: string): StringCase => {
+const detectCase = (input: string): StringCase => {
   if (input.includes('_')) {
     if (/^([A-Z][A-Z0-9_]+)+$/.test(input)) return StringCase.ScreamingSnakeCase;
     if (/^([a-z][a-z0-9_]+)+$/.test(input)) return StringCase.SnakeCase;
@@ -13,7 +13,7 @@ export const detectCase = (input: string): StringCase => {
   if (/^([A-Z][a-z0-9_]*[A-Z]*){2,}$/.test(input)) return StringCase.PascalCase;
   if (/^([a-z][a-z0-9_]*[A-Z][a-z0-9_]*)+$/.test(input)) return StringCase.CamelCase;
 
-  throw Error('Could not detect case');
+  return StringCase.MixedCase;
 };
 
 /**
@@ -30,7 +30,7 @@ const capitalise = (input: string): string => {
  * Split camel or pascal case into individual words
  * @param input
  */
-export const deconstructCamelOrPascalCase = (input: string): string[] => {
+const deconstructCamelOrPascalCase = (input: string): string[] => {
   return input.split(
     /(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|(?<=[a-zA-Z])(?=[0-9])|(?<=[0-9])(?=[a-zA-Z])/
   );
@@ -40,8 +40,19 @@ export const deconstructCamelOrPascalCase = (input: string): string[] => {
  * Split snake or screaming snake into individual words
  * @param input
  */
-export const deconstructSnakeOrScreamingSnakeCase = (input: string): string[] => {
+const deconstructSnakeOrScreamingSnakeCase = (input: string): string[] => {
   return input.split('_');
+};
+
+/**
+ * Split a mix of different cases into individual words
+ * @param input
+ */
+const deconstructMixedCase = (input: string): string[] => {
+  const regex =
+    /(?:[A-Z]+|[a-z]+|\d+)(?:(?=[A-Z])|(?<=[A-Z])(?=[a-z\d])|(?<=[a-z\d])(?=\d)|(?<=[^\w\d_])|$)/g;
+  const words = input.match(regex);
+  return words ? words.filter(Boolean) : [];
 };
 
 // Re-constructors
@@ -50,7 +61,7 @@ export const deconstructSnakeOrScreamingSnakeCase = (input: string): string[] =>
  * Construct camel case string from an array of words
  * @param words
  */
-export const constructCamelCase = (words: string[]): string => {
+const constructCamelCase = (words: string[]): string => {
   return words
     .map((word, i) => {
       if (!i) return word.toLowerCase();
@@ -63,13 +74,13 @@ export const constructCamelCase = (words: string[]): string => {
  * Construct pascal case string from an array of words
  * @param words
  */
-export const constructPascalCase = (words: string[]): string => words.map(capitalise).join('');
+const constructPascalCase = (words: string[]): string => words.map(capitalise).join('');
 
 /**
  * Construct snake case string from an array of words
  * @param words
  */
-export const constructSnakeCase = (words: string[]): string => {
+const constructSnakeCase = (words: string[]): string => {
   return words.map((word) => word.toLowerCase()).join('_');
 };
 
@@ -77,7 +88,7 @@ export const constructSnakeCase = (words: string[]): string => {
  * Construct screaming snake case string from an array of words
  * @param words
  */
-export const constructScreamingSnakeCase = (words: string[]): string => {
+const constructScreamingSnakeCase = (words: string[]): string => {
   return words.map((word) => word.toUpperCase()).join('_');
 };
 
@@ -86,7 +97,7 @@ export const constructScreamingSnakeCase = (words: string[]): string => {
  * @param words
  * @param casing
  */
-export const constructString = (words: string[], casing: StringCase): string => {
+const constructString = (words: string[], casing: StringCase): string => {
   switch (casing) {
     case StringCase.PascalCase:
       return constructPascalCase(words);
@@ -96,6 +107,8 @@ export const constructString = (words: string[], casing: StringCase): string => 
       return constructSnakeCase(words);
     case StringCase.ScreamingSnakeCase:
       return constructScreamingSnakeCase(words);
+    default:
+      throw Error('Cannot reconstruct as mixed case');
   }
 };
 
@@ -116,5 +129,7 @@ export const transformStringToCase = (value: string, casing: StringCase): string
     case StringCase.SnakeCase:
     case StringCase.ScreamingSnakeCase:
       return constructString(deconstructSnakeOrScreamingSnakeCase(value), casing);
+    default:
+      return constructString(deconstructMixedCase(value), casing);
   }
 };
