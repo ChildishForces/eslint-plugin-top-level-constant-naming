@@ -32,6 +32,11 @@ const schema = {
         enum: ['string', 'number', 'boolean', 'array', 'object', 'function'],
       },
     },
+    exceptionPattern: {
+      type: 'string',
+      description:
+        'A glob pattern of constant names to ignore. If none supplied, all top-level constants are ignored',
+    },
   },
   additionalProperties: false,
 } as const;
@@ -50,7 +55,9 @@ export const meta = {
 
 export const create: Rule.RuleModule['create'] = (context) => {
   const [options] = context.options;
-  const { casing, pattern, skipDeclarationTypes } = options as FromSchema<typeof schema>;
+  const { casing, pattern, skipDeclarationTypes, exceptionPattern } = options as FromSchema<
+    typeof schema
+  >;
 
   if (pattern && !minimatch(context.getFilename(), pattern)) return {};
 
@@ -100,6 +107,8 @@ export const create: Rule.RuleModule['create'] = (context) => {
     if (id.type === 'Identifier') {
       const { name } = id;
       const expected = transformStringToCase(name, casing);
+
+      if (exceptionPattern && minimatch(name, exceptionPattern)) return;
 
       if (name !== expected) {
         context.report({
