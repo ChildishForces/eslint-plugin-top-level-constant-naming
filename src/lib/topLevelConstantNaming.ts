@@ -11,7 +11,8 @@ const schema = {
   properties: {
     casing: {
       type: 'string',
-      description: 'The casing that should be applied to all top level constants',
+      description:
+        'The casing that should be applied to all top level constants',
       enum: [
         StringCase.PascalCase,
         StringCase.SnakeCase,
@@ -21,7 +22,8 @@ const schema = {
     },
     pattern: {
       type: 'string',
-      description: 'A glob pattern of files to include. If none supplied, all files are valid',
+      description:
+        'A glob pattern of files to include. If none supplied, all files are valid',
     },
     skipDeclarationTypes: {
       type: 'array',
@@ -35,7 +37,12 @@ const schema = {
     exceptionPattern: {
       type: 'string',
       description:
-        'A glob pattern of constant names to ignore. If none supplied, all top-level constants are ignored',
+        'A glob pattern of constant names to ignore. If none supplied, all top-level constants are included',
+    },
+    inclusionPattern: {
+      type: 'string',
+      description:
+        'A glob pattern of constant names to include. If none supplied, all top-level constants are included',
     },
   },
   additionalProperties: false,
@@ -55,9 +62,13 @@ export const meta = {
 
 export const create: Rule.RuleModule['create'] = (context) => {
   const [options] = context.options;
-  const { casing, pattern, skipDeclarationTypes, exceptionPattern } = options as FromSchema<
-    typeof schema
-  >;
+  const {
+    casing,
+    pattern,
+    skipDeclarationTypes,
+    exceptionPattern,
+    inclusionPattern,
+  } = options as FromSchema<typeof schema>;
 
   if (pattern && !minimatch(context.getFilename(), pattern)) return {};
 
@@ -65,7 +76,10 @@ export const create: Rule.RuleModule['create'] = (context) => {
     if (!node) return false;
     if (!skipDeclarationTypes) return false;
 
-    const checkLiteral = (node: Literal, type: 'string' | 'number' | 'boolean') => {
+    const checkLiteral = (
+      node: Literal,
+      type: 'string' | 'number' | 'boolean'
+    ) => {
       return skipDeclarationTypes.includes(type) && typeof node.value === type;
     };
 
@@ -109,6 +123,7 @@ export const create: Rule.RuleModule['create'] = (context) => {
       const expected = transformStringToCase(name, casing);
 
       if (exceptionPattern && minimatch(name, exceptionPattern)) return;
+      if (inclusionPattern && !minimatch(name, inclusionPattern)) return;
 
       if (name !== expected) {
         context.report({

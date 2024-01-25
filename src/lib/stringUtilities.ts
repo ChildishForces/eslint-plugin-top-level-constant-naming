@@ -6,12 +6,14 @@ import { StringCase } from './constants';
  */
 const detectCase = (input: string): StringCase => {
   if (input.includes('_')) {
-    if (/^([A-Z][A-Z0-9_]+)+$/.test(input)) return StringCase.ScreamingSnakeCase;
+    if (/^([A-Z][A-Z0-9_]+)+$/.test(input))
+      return StringCase.ScreamingSnakeCase;
     if (/^([a-z][a-z0-9_]+)+$/.test(input)) return StringCase.SnakeCase;
   }
 
   if (/^([A-Z][a-z0-9_]*[A-Z]*){2,}$/.test(input)) return StringCase.PascalCase;
-  if (/^([a-z][a-z0-9_]*[A-Z][a-z0-9_]*)+$/.test(input)) return StringCase.CamelCase;
+  if (/^([a-z][a-z0-9_]*[A-Z][a-z0-9_]*)+$/.test(input))
+    return StringCase.CamelCase;
 
   return StringCase.MixedCase;
 };
@@ -74,7 +76,8 @@ const constructCamelCase = (words: string[]): string => {
  * Construct pascal case string from an array of words
  * @param words
  */
-const constructPascalCase = (words: string[]): string => words.map(capitalise).join('');
+const constructPascalCase = (words: string[]): string =>
+  words.map(capitalise).join('');
 
 /**
  * Construct snake case string from an array of words
@@ -119,7 +122,10 @@ const constructString = (words: string[], casing: StringCase): string => {
  * @param value
  * @param casing
  */
-export const transformStringToCase = (value: string, casing: StringCase): string => {
+export const transformStringToCase = (
+  value: string,
+  casing: StringCase
+): string => {
   const originalCasing = detectCase(value);
 
   switch (originalCasing) {
@@ -128,7 +134,10 @@ export const transformStringToCase = (value: string, casing: StringCase): string
       return constructString(deconstructCamelOrPascalCase(value), casing);
     case StringCase.SnakeCase:
     case StringCase.ScreamingSnakeCase:
-      return constructString(deconstructSnakeOrScreamingSnakeCase(value), casing);
+      return constructString(
+        deconstructSnakeOrScreamingSnakeCase(value),
+        casing
+      );
     default:
       return constructString(deconstructMixedCase(value), casing);
   }

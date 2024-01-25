@@ -73,5 +73,6 @@ Options can be any of the following properties:
 - `pattern`: Optional glob pattern that if provided will match only files that fit the pattern for applying the rule
 - `skipDeclarationTypes`: Optional array of declaration types that will be skipped by the rule. May include any of "string", "number", "boolean", "array", "object" or "function".
 - `exceptionPattern`: Optional glob pattern of exceptions in constant names. If not provided all top-level constant names are eligible.
+- `inclusionPattern`: Optional glob pattern of inclusions in constant names. If not provided all top-level constant names are eligible.
 
 
